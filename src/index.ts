@@ -1,9 +1,17 @@
 import express from 'express'
+import cors from 'cors'
+import config from '../config'
+import { authRouter } from './routers'
 
 const app = express()
+app.use(cors())
 
-app.get('/', (req, res) => {
+app.use('/auth', authRouter)
+
+app.get('/home', (_, res) => {
   res.json({ message: 'Hello world' })
 })
 
-app.listen(8080, () => console.log('Listening to localhost:8080'))
+app.listen(config.app.PORT, () => {
+  console.log(`Listening to localhost:${config.app.PORT}`)
+})
