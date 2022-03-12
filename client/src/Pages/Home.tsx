@@ -1,13 +1,25 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { getAuthUrl } from '../Services/Spotify'
+import { UserContext } from '../Services/UserContext'
+
 const Login: React.FC = () => {
 	return (
-		<button className='py-2 px-4 rounded-md bg-green-600 text-white font-semibold uppercase'>
-			<a href='http://localhost:8080/auth/login'>Log in with spotify</a>
-		</button>
+		<div className='p-8'>
+			<a
+				className='py-2 px-4 rounded-md bg-green-600 text-white font-semibold uppercase'
+				href={getAuthUrl()}
+			>
+				Login with spotify
+			</a>
+		</div>
 	)
 }
 const Home = () => {
-	return <Login />
+	const userContext = useContext(UserContext)
+	const userToken = userContext?.userToken
+
+	if (!userToken) return <Login />
+	return <div>Hello</div>
 }
 
 export default Home

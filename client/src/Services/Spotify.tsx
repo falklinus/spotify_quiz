@@ -7,35 +7,46 @@ interface SpotifyWebApiContextModel {
 	token: string | null
 }
 
+function generateRandomString(length: number): string {
+	let text = ''
+	const possible =
+		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+	for (let i = 0; i < length; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length))
+	}
+	return text
+}
+
 export const SpotifyWebApiContext =
 	createContext<SpotifyWebApiContextModel | null>(null)
 
-export const getAuthUrl = (scopes?: Array<string>): string => {
-	const my_client_id = 'f8f1a87f489e411da6b5bf741c103b49'
-	if (!scopes) {
-		scopes = [
-			'streaming',
-			'user-read-email',
-			'user-read-private',
-			'user-read-currently-playing',
-			'user-read-playback-state',
-			'user-modify-playback-state',
-			'playlist-read-private',
-			'playlist-read-collaborative',
-		]
-	}
-	const redirect_uri = 'http://localhost:3000'
+export const getAuthUrl = (): string => {
+	const client_id = 'f8f1a87f489e411da6b5bf741c103b49'
+	const scopes = [
+		'streaming',
+		'user-read-email',
+		'user-read-private',
+		'user-read-currently-playing',
+		'user-read-playback-state',
+		'user-modify-playback-state',
+		'playlist-read-private',
+		'playlist-read-collaborative',
+	].join(' ')
 
-	return (
-		'https://accounts.spotify.com/authorize' +
-		'?response_type=token' +
-		'&show_dialog=true' +
-		'&client_id=' +
-		my_client_id +
-		(scopes ? '&scope=' + encodeURIComponent(scopes.join('%20')) : '') +
-		'&redirect_uri=' +
-		encodeURIComponent(redirect_uri)
-	)
+	const redirect_uri = 'http://localhost:3000/home'
+
+	const state = generateRandomString(16)
+	localStorage.setItem('stateKey', state)
+
+	let url = 'https://accounts.spotify.com/authorize'
+	url += '?response_type=token'
+	url += '&client_id=' + encodeURIComponent(client_id)
+	url += '&scope=' + encodeURIComponent(scopes)
+	url += '&redirect_uri=' + encodeURIComponent(redirect_uri)
+	url += '&state=' + encodeURIComponent(state)
+
+	https: return url
 }
 
 const SpotifyProvider: React.FC<React.ReactNode> = ({ children }) => {
