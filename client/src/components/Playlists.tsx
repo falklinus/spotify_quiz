@@ -10,9 +10,6 @@ const Playlists = () => {
 
 	useEffect(() => {
 		if (spotifyWebApi?.getAccessToken()) {
-			spotifyWebApi.searchPlaylists('stronk').then((res) => {
-				console.log(res)
-			})
 			spotifyWebApi
 				?.getUserPlaylists()
 				.then((res) => {
@@ -24,9 +21,11 @@ const Playlists = () => {
 	}, [spotifyWebApi])
 
 	return (
-		<div className='grid grid-cols-2 gap-4'>
+		<div className='grid grid-cols-2 gap-y-4'>
 			{playlists.map((playlist) => {
-				return <PlaylistItem playlist={playlist}></PlaylistItem>
+				return (
+					<PlaylistItem playlist={playlist} key={playlist.id}></PlaylistItem>
+				)
 			})}
 		</div>
 	)

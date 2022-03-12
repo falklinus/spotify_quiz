@@ -10,7 +10,7 @@ const App: FunctionComponent = () => {
 			<SpotifyProvider>
 				<UserProvider>
 					<Routes>
-						<Route path='/home' element={<Home />} />
+						<Route path='/' element={<Home />} />
 					</Routes>
 				</UserProvider>
 			</SpotifyProvider>

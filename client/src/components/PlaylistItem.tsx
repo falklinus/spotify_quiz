@@ -4,7 +4,7 @@ const PlaylistItem: React.FC<{
 	playlist: SpotifyApi.PlaylistObjectSimplified
 }> = (playlist) => {
 	return (
-		<div className='rounded overflow-hidden shadow-lg w-80 h-98'>
+		<div className='rounded shadow-lg w-80'>
 			{playlist.playlist.images[0]?.url && (
 				<img
 					className='h-80 object-cover'

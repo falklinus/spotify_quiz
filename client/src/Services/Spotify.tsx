@@ -34,7 +34,7 @@ export const getAuthUrl = (): string => {
 		'playlist-read-collaborative',
 	].join(' ')
 
-	const redirect_uri = 'http://localhost:3000/home'
+	const redirect_uri = process.env.REACT_APP_REDIRECT_URI as string
 
 	const state = generateRandomString(16)
 	localStorage.setItem('stateKey', state)
