@@ -24,11 +24,11 @@ const Playlists = () => {
 	}, [spotifyWebApi])
 
 	return (
-		<>
+		<div className='grid grid-cols-2 gap-4'>
 			{playlists.map((playlist) => {
 				return <PlaylistItem playlist={playlist}></PlaylistItem>
 			})}
-		</>
+		</div>
 	)
 }
 export default Playlists
