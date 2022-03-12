@@ -39,8 +39,8 @@ const UserProvider: React.FC<Props> = ({ children }) => {
 
 	const logoutUser = useCallback(() => {
 		console.log('försöker logga ut')
-		//window.location.href = "/";
 		localStorage.removeItem('SpotifyToken')
+		localStorage.removeItem('stateKey')
 		setUserToken(null)
 		setAuthorizationHeader(null)
 	}, [setAuthorizationHeader])
@@ -105,6 +105,7 @@ const getSpotifyAuthRes = () => {
 			return initial
 		}, {})
 	window.location.hash = ''
+	window.history.pushState(null, '', ' ')
 	return hash
 }
 

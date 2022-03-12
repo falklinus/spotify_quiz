@@ -22,7 +22,7 @@ export const SpotifyWebApiContext =
 	createContext<SpotifyWebApiContextModel | null>(null)
 
 export const getAuthUrl = (): string => {
-	const client_id = 'f8f1a87f489e411da6b5bf741c103b49'
+	const client_id = '74c7667e428f44659fa14396a442d8ed'
 	const scopes = [
 		'streaming',
 		'user-read-email',
