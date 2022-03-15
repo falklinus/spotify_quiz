@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
-// import useSpotifyOld from '../hooks/useSpotify'
+import React, { useEffect, useState } from 'react'
 import { useSpotify } from '../Services/Spotifyv2'
 
 const Login: React.FC = () => {
