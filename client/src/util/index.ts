@@ -25,7 +25,6 @@ export function handleTokenUrlResponse() {
 
 function getSpotifyAuthRes() {
   // Get the hash of the url
-
   const hash = window.location.hash
     .substring(1)
     .split('&')

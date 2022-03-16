@@ -1,42 +1,51 @@
 import { Request, Response } from 'express'
 import config from '../../config'
-
-function generateRandomString(length: number): string {
-	let text = ''
-	const possible =
-		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-
-	for (let i = 0; i < length; i++) {
-		text += possible.charAt(Math.floor(Math.random() * possible.length))
-	}
-	return text
-}
+import SpotifyWebApi from 'spotify-web-api-node'
 
 export const authService = {
-	login: (_: Request, res: Response) => {
-		const scope = 'user-read-private user-read-email'
-		const redirect_uri = 'http%3A%2F%2Flocalhost:3000/home'
-		const state = generateRandomString(16)
-		res.redirect(
-			`https://accounts.spotify.com/authorize?response_type=code&client_id=${config.spotifyClient.id}&scope=${scope}&state=${state}&redirect_uri=${redirect_uri}`
-		)
-	},
+  login: (req: Request, res: Response) => {
+    const { code } = req.body
+    const spotifyApi = new SpotifyWebApi({
+      redirectUri: config.spotifyClient.redirectURI,
+      clientId: config.spotifyClient.id,
+      clientSecret: config.spotifyClient.secret,
+    })
 
-	refresh: (req: Request, res: Response) => {
-		const { refreshToken } = req.query
+    spotifyApi
+      .authorizationCodeGrant(code)
+      .then((data: any) => {
+        res.json({
+          accessToken: data.body.access_token,
+          refreshToken: data.body.refresh_token,
+          expiresIn: data.body.expires_in,
+        })
+      })
+      .catch((err: any) => {
+        console.log(err)
+        res.sendStatus(400)
+      })
+  },
 
-		const body = new FormData()
-		body.append('grant_type', 'refresh_token')
-		body.append('refresh_token', `${refreshToken}`)
+  refresh: (req: Request, res: Response) => {
+    const { refreshToken } = req.body
+    const spotifyApi = new SpotifyWebApi({
+      redirectUri: config.spotifyClient.redirectURI,
+      clientId: config.spotifyClient.id,
+      clientSecret: config.spotifyClient.secret,
+      refreshToken,
+    })
 
-		fetch('https://accounts.spotify.com/api/token', {
-			method: 'POST',
-			headers: {
-				Authorization: `Basic ${config.spotifyClient.id}:${config.spotifyClient.secret}`,
-			},
-			body,
-		})
-			.then(resp => resp.json())
-			.then(data => res.json(data))
-	},
+    spotifyApi
+      .refreshAccessToken()
+      .then((data: any) => {
+        res.json({
+          accessToken: data.body.accessToken,
+          expiresIn: data.body.expiresIn,
+        })
+      })
+      .catch((err: any) => {
+        console.log(err)
+        res.sendStatus(400)
+      })
+  },
 }
