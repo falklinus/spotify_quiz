@@ -1,48 +1,45 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Layout from './components/Layout'
-import PlayLists from './Pages/PlayLists'
-import Home from './Pages/Home'
-import Login from './Pages/Login'
-import RandomPage from './Pages/RandomPage'
-import ProtectedRoute from './components/ProtectedRoute'
-import { SpotifyProvider } from './Services/Spotify'
-import { useCallback, useEffect } from 'react'
+import { Home, Playlists, RandomPage } from 'pages'
+import { Layout, ProtectedRoute } from 'components'
+import { AuthProvider, SpotifyProvider } from 'hooks'
 
 const App: React.FC = () => {
+  console.log('render')
   return (
-    <SpotifyProvider>
-      <Layout>
+    <AuthProvider>
+      <SpotifyProvider>
         <Router>
-          <Routes>
-            <Route path='/login' element={<Login />} />
-            <Route
-              path='/'
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path='/playlists'
-              element={
-                <ProtectedRoute>
-                  <PlayLists />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path='/random-page'
-              element={
-                <ProtectedRoute>
-                  <RandomPage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
+          <Layout>
+            <Routes>
+              <Route
+                path='/'
+                element={
+                  <ProtectedRoute>
+                    <Home />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/playlists'
+                element={
+                  <ProtectedRoute>
+                    <Playlists />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/random-page'
+                element={
+                  <ProtectedRoute>
+                    <RandomPage />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Layout>
         </Router>
-      </Layout>
-    </SpotifyProvider>
+      </SpotifyProvider>
+    </AuthProvider>
   )
 }
 

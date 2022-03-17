@@ -1,29 +1,9 @@
-import { /* useEffect, */ useMemo, useState } from 'react'
-import { useSpotify } from '../Services/Spotify'
-import PlaylistItem from '../components/PlayListItem'
 import { Link } from 'react-router-dom'
+import { PlaylistItem } from '../components'
+import { useSpotify } from 'hooks'
 
 const PlayLists = () => {
-  const { playlists /* , getPlaylists */ } = useSpotify()
-
-  // const [playlists, setPlaylists] = useState<
-  //   SpotifyApi.PlaylistObjectSimplified[]
-  // >([])
-
-  // useEffect(() => {
-  //   getPlaylists().then(setPlaylists)
-  //   return setPlaylists([])
-  // }, [getPlaylists])
-
-  const [filter, setFilter] = useState('')
-
-  const filtered = useMemo(
-    () =>
-      playlists.filter((list) =>
-        list.name.toLowerCase().includes(filter.toLowerCase())
-      ),
-    [playlists, filter]
-  )
+  const { playlists, searchPlaylist, setSearchPlaylist } = useSpotify()
 
   return (
     <>
@@ -36,12 +16,12 @@ const PlayLists = () => {
       <input
         className='mb-4 rounded-lg border px-4 py-2 outline-none w-full'
         type='text'
-        value={filter}
-        onChange={({ target }) => setFilter(target.value)}
+        value={searchPlaylist}
+        onChange={({ target }) => setSearchPlaylist(target.value)}
         placeholder='Search Playlist'
       />
       <div className='grid gap-y-4 xs:grid-cols-[repeat(auto-fill,minmax(216px,1fr))]'>
-        {filtered.map((list: any) => (
+        {playlists.map((list: any) => (
           <PlaylistItem key={list.id} playlist={list} />
         ))}
       </div>

@@ -1,8 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useSpotify } from '../Services/Spotify'
-
 const Home = () => {
-  const { logout } = useSpotify()
   return (
     <>
       <Link to='/playlists'>
@@ -10,7 +7,11 @@ const Home = () => {
           Playlists
         </button>
       </Link>
-      <button onClick={logout}>Logout</button>
+      <Link to='/random-page'>
+        <button className='py-2 px-4 rounded-md font-semibold uppercase border'>
+          Random Page
+        </button>
+      </Link>
     </>
   )
 }
