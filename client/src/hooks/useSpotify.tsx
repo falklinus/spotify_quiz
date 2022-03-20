@@ -29,17 +29,25 @@ const useSpotifyManager = () => {
   const [playlists, setPlaylists] = useState<
     SpotifyApi.PlaylistObjectSimplified[]
   >([])
+  const [playlistId, setPlaylistId] = useState('')
+  const [playlistTracks, setPlaylistTracks] =
+    useState<SpotifyApi.PlaylistTrackObject[]>()
 
   // Function to get playlists from Api
-  const getPlaylists = useCallback(async () => {
-    if (!authenticated) return []
-    return (await Spotify.getUserPlaylists()).items
+  useEffect(() => {
+    if (!authenticated) return
+    Spotify.getUserPlaylists()
+      .then((resp) => resp.items)
+      .then(setPlaylists)
   }, [Spotify, authenticated])
 
-  // Get playlists on load and store in state
+  // Get single playlist with ID from Api
   useEffect(() => {
-    getPlaylists().then(setPlaylists)
-  }, [getPlaylists])
+    if (!playlistId) return
+    Spotify.getPlaylistTracks(playlistId)
+      .then((resp) => resp.items)
+      .then(setPlaylistTracks)
+  }, [Spotify, playlistId])
 
   // Filter playlist on search input
   const filteredPlaylist = useMemo(
@@ -50,10 +58,21 @@ const useSpotifyManager = () => {
     [playlists, searchPlaylist]
   )
 
+  const getTrackById = useCallback(
+    async (trackId: string) => {
+      const track = await Spotify.getTrack(trackId)
+      if (track) return track
+    },
+    [Spotify]
+  )
+
   return {
     playlists: filteredPlaylist,
     searchPlaylist,
     setSearchPlaylist,
+    playlistTracks,
+    setPlaylistId,
+    getTrackById,
   }
 }
 
@@ -61,6 +80,9 @@ const SpotifyContext = createContext<ReturnType<typeof useSpotifyManager>>({
   playlists: [],
   searchPlaylist: '',
   setSearchPlaylist: () => {},
+  playlistTracks: [],
+  setPlaylistId: () => {},
+  getTrackById: async () => undefined,
 })
 
 export const SpotifyProvider: React.FC = ({ children }) => {

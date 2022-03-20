@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Home, Playlists, RandomPage } from 'pages'
+import { Home, Playlists, RandomPage, Playlist } from 'Pages'
 import { Layout, ProtectedRoute } from 'components'
 import { AuthProvider, SpotifyProvider } from 'hooks'
 
@@ -24,6 +24,14 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <Playlists />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/playlists/:id'
+                element={
+                  <ProtectedRoute>
+                    <Playlist />
                   </ProtectedRoute>
                 }
               />

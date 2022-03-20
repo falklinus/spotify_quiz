@@ -8,11 +8,10 @@ const PlayLists = () => {
   return (
     <>
       <Link to='/'>
-        <button className='py-2 px-4 rounded-md font-semibold uppercase border'>
+        <button className='py-2 px-4 rounded-md font-semibold uppercase border mb-8'>
           Back
         </button>
       </Link>
-      <p className='text-2xl font-bold mb-4'>Your playlists</p>
       <input
         className='mb-4 rounded-lg border px-4 py-2 outline-none w-full'
         type='text'
