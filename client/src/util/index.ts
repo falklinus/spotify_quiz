@@ -31,7 +31,7 @@ export function login(): string {
   }
 
   let url = 'https://accounts.spotify.com/authorize'
-  url += '?response_type=token'
+  url += '?response_type=code'
   url += '&client_id=' + encodeURIComponent(client_id)
   url += '&scope=' + encodeURIComponent(scopes)
   url += '&redirect_uri=' + encodeURIComponent(redirect_uri)

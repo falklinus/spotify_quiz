@@ -11,15 +11,13 @@ import { useAuth } from 'hooks'
 
 const useSpotifyManager = () => {
   const Spotify = useMemo(() => new SpotifyWebApi(), [])
-  const {
-    authenticated,
-    token: { token },
-  } = useAuth()
+
+  const { accessToken } = useAuth()
 
   useEffect(() => {
-    if (authenticated) Spotify.setAccessToken(token)
+    if (accessToken) Spotify.setAccessToken(accessToken)
     else Spotify.setAccessToken('')
-  }, [authenticated, token, Spotify])
+  }, [accessToken, Spotify])
 
   /*
     Manage playlist search through context
@@ -35,11 +33,11 @@ const useSpotifyManager = () => {
 
   // Function to get playlists from Api
   useEffect(() => {
-    if (!authenticated) return
+    if (!accessToken) return
     Spotify.getUserPlaylists()
       .then((resp) => resp.items)
       .then(setPlaylists)
-  }, [Spotify, authenticated])
+  }, [Spotify, accessToken])
 
   // Get single playlist with ID from Api
   useEffect(() => {
