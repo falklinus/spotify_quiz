@@ -22,7 +22,7 @@ export function login(): string {
     'playlist-read-collaborative',
   ].join(' ')
 
-  const redirect_uri = 'http://localhost:3000/'
+  let redirect_uri = 'http://localhost:3000/'
 
   let state = localStorage.getItem('stateKey')
   if (!state) {

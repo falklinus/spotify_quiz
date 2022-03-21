@@ -1,10 +1,20 @@
 import { Link } from 'react-router-dom'
 import { LoadingPlaylists, PlaylistItem } from '../components'
 import { useSpotify } from 'hooks'
+import { useMemo, useState } from 'react'
+import { useQuery } from 'react-query'
 
 const PlayLists: React.FC = () => {
-  const { playlists, isPlaylistsLoading, searchPlaylist, setSearchPlaylist } =
-    useSpotify()
+  const { getUserPlaylists } = useSpotify()
+  const { data: playlists, isLoading } = useQuery('playlists', getUserPlaylists)
+  const [searchPlaylist, setSearchPlaylist] = useState('')
+  const filteredPlaylist = useMemo(
+    () =>
+      playlists?.filter((list) =>
+        list.name.toLowerCase().includes(searchPlaylist.toLowerCase())
+      ),
+    [playlists, searchPlaylist]
+  )
 
   return (
     <>
@@ -21,8 +31,8 @@ const PlayLists: React.FC = () => {
         placeholder='Search Playlist'
       />
       <div className='grid gap-y-4 xs:grid-cols-[repeat(auto-fill,minmax(216px,1fr))]'>
-        {isPlaylistsLoading && <LoadingPlaylists />}
-        {playlists?.map((list: any) => (
+        {isLoading && <LoadingPlaylists />}
+        {filteredPlaylist?.map((list: any) => (
           <PlaylistItem key={list.id} playlist={list} />
         ))}
       </div>

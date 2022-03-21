@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom'
-import { useSpotify } from 'hooks'
 
 const RandomPage: React.FC = () => {
-  const { searchPlaylist } = useSpotify()
   return (
     <div>
       <Link to='/'>
@@ -11,8 +9,6 @@ const RandomPage: React.FC = () => {
         </button>
       </Link>
       <p>RandomPage</p>
-
-      <p>{searchPlaylist}</p>
     </div>
   )
 }

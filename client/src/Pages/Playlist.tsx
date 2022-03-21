@@ -1,15 +1,18 @@
 import { PlaylistTrack } from 'components'
+import LoadingPlaylistTracks from 'components/LoadingPlaylistTracks'
 import { useSpotify } from 'hooks'
 import { useEffect } from 'react'
+import { useQuery } from 'react-query'
 import { useParams } from 'react-router'
 import { Link } from 'react-router-dom'
 
 const Playlist: React.FC = () => {
-  const { playlistTracks, setPlaylistId } = useSpotify()
+  const { getPlaylistTracks } = useSpotify()
   const { id } = useParams()
-  useEffect(() => {
-    if (id) setPlaylistId(id)
-  }, [id, setPlaylistId])
+  const { data: playlistTracks, isLoading } = useQuery(['playlist', id], () =>
+    getPlaylistTracks(id as string)
+  )
+
   return (
     <>
       <Link to='/playlists'>
@@ -17,6 +20,7 @@ const Playlist: React.FC = () => {
           Back
         </button>
       </Link>
+      {isLoading && <LoadingPlaylistTracks />}
       <div className='flex flex-col gap-2'>
         {playlistTracks?.map(({ track }) => (
           <PlaylistTrack key={track.id} track={track} />

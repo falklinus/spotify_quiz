@@ -8,7 +8,6 @@ import {
 import axios from 'axios'
 
 function useAuthManager() {
-  const [code, setCode] = useState('')
   const [accessToken, setAccessToken] = useState('')
   const [refreshToken, setRefreshToken] = useState('')
   const [expiresIn, setExpiresIn] = useState(0)
@@ -16,14 +15,12 @@ function useAuthManager() {
   const logout = () => {
     console.log('logout')
     localStorage.removeItem('SpotifyRefreshToken')
-    setCode('')
     setAccessToken('')
     setRefreshToken('')
     setExpiresIn(0)
   }
 
-  useEffect(() => {
-    if (!code) return
+  const login = useCallback((code: string) => {
     axios
       .post('http://localhost:8080/auth/login', {
         code,
@@ -33,16 +30,14 @@ function useAuthManager() {
         setAccessToken(data.accessToken)
         setRefreshToken(data.refreshToken)
         setExpiresIn(data.expiresIn)
-
         localStorage.setItem('SpotifyRefreshToken', data.refreshToken)
-
         window.history.pushState({}, '', '/')
       })
       .catch(() => {
         logout()
         // window.location.href = '/'
       })
-  }, [code])
+  }, [])
 
   const updateToken = useCallback(() => {
     axios
@@ -62,23 +57,20 @@ function useAuthManager() {
 
   useEffect(() => {
     if (!refreshToken) return
-
     if (!accessToken && refreshToken) {
       return updateToken()
     }
-
     const interval = setInterval(() => {
       updateToken()
     }, (expiresIn - 60) * 1000)
-
     return () => clearInterval(interval)
   }, [refreshToken, updateToken, accessToken, expiresIn])
 
   return {
     authenticated: !!accessToken,
     accessToken,
-    setCode,
     logout,
+    login,
     setRefreshToken,
   }
 }
@@ -86,8 +78,8 @@ function useAuthManager() {
 const AuthContext = createContext<ReturnType<typeof useAuthManager>>({
   authenticated: false,
   accessToken: '',
-  setCode: () => {},
   logout: () => {},
+  login: () => {},
   setRefreshToken: () => {},
 })
 export const AuthProvider: React.FC = ({ children }) => {
