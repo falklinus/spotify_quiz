@@ -1,6 +1,6 @@
 import { useAuth } from 'hooks'
 
-const Logout = () => {
+const Logout: React.FC = () => {
   const { logout } = useAuth()
 
   return (

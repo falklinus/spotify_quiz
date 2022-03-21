@@ -1,53 +1,10 @@
-// import React, { createContext, useContext, useEffect, useState } from 'react'
-// import { login } from '../util'
-// import { useLocalStorage } from 'hooks'
-
-// function useAuthManager() {
-//   const [token, setToken] = useLocalStorage('SpotifyToken', {
-//     token: '',
-//     expires: 0,
-//   })
-//   const [authenticated, setAuthenticated] = useState(false)
-
-//   useEffect(() => {
-//     if (token.token && token.expires > Date.now()) {
-//       setAuthenticated(true)
-//     } else {
-//       setAuthenticated(false)
-//     }
-//   }, [token.token, token.expires])
-
-//   const logout = () => {
-//     setToken({
-//       token: '',
-//       expires: 0,
-//     })
-//   }
-
-//   return {
-//     authenticated,
-//     token,
-//     setToken,
-//     logout,
-//     login,
-//   }
-// }
-
-// const AuthContext = createContext<ReturnType<typeof useAuthManager>>({
-//   authenticated: false,
-//   token: { token: '', expires: 0 },
-//   setToken: () => {},
-//   logout: () => {},
-//   login: () => '',
-// })
-// export const AuthProvider: React.FC = ({ children }) => {
-//   return (
-//     <AuthContext.Provider value={useAuthManager()}>
-//       {children}
-//     </AuthContext.Provider>
-//   )
-// }
-import { useState, useEffect, createContext, useContext } from 'react'
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  useCallback,
+} from 'react'
 import axios from 'axios'
 
 function useAuthManager() {
@@ -57,24 +14,27 @@ function useAuthManager() {
   const [expiresIn, setExpiresIn] = useState(0)
 
   const logout = () => {
-    localStorage.removeItem('SpotifyCode')
+    console.log('logout')
+    localStorage.removeItem('SpotifyRefreshToken')
     setCode('')
+    setAccessToken('')
+    setRefreshToken('')
+    setExpiresIn(0)
   }
 
   useEffect(() => {
-    console.log(code)
     if (!code) return
     axios
       .post('http://localhost:8080/auth/login', {
         code,
       })
-      .then((res) => {
-        setAccessToken(res.data.accessToken)
-        setRefreshToken(res.data.refreshToken)
-        setExpiresIn(res.data.expiresIn)
+      .then(({ data }) => {
+        // Successful login
+        setAccessToken(data.accessToken)
+        setRefreshToken(data.refreshToken)
+        setExpiresIn(data.expiresIn)
 
-        localStorage.setItem('SpotifyCode', res.data.refreshToken)
-        localStorage.setItem('ExpiresIn', res.data.expiresIn)
+        localStorage.setItem('SpotifyRefreshToken', data.refreshToken)
 
         window.history.pushState({}, '', '/')
       })
@@ -84,39 +44,51 @@ function useAuthManager() {
       })
   }, [code])
 
+  const updateToken = useCallback(() => {
+    axios
+      .post('http://localhost:8080/auth/refresh', {
+        refreshToken,
+      })
+      .then(({ data }) => {
+        // Successful refresh
+        setAccessToken(data.accessToken)
+        setExpiresIn(data.expiresIn)
+      })
+      .catch(() => {
+        logout()
+        window.location.href = '/'
+      })
+  }, [refreshToken, setAccessToken, setExpiresIn])
+
   useEffect(() => {
-    if (!refreshToken || !expiresIn) return
-    console.log('expires and refresh')
+    if (!refreshToken) return
+
+    if (!accessToken && refreshToken) {
+      return updateToken()
+    }
+
     const interval = setInterval(() => {
-      axios
-        .post('http://localhost:8080/auth/refresh', {
-          refreshToken,
-        })
-        .then((res) => {
-          console.log(res)
-          setAccessToken(res.data.accessToken)
-          setExpiresIn(res.data.expiresIn)
-          localStorage.setItem('ExpiresIn', res.data.expiresIn)
-        })
-        .catch((err: any) => {
-          console.log(err)
-          logout()
-          // window.location.href = '/'
-        })
+      updateToken()
     }, (expiresIn - 60) * 1000)
 
     return () => clearInterval(interval)
-  }, [refreshToken, expiresIn])
+  }, [refreshToken, updateToken, accessToken, expiresIn])
 
-  return { accessToken, setCode, logout, setRefreshToken, setExpiresIn }
+  return {
+    authenticated: !!accessToken,
+    accessToken,
+    setCode,
+    logout,
+    setRefreshToken,
+  }
 }
 
 const AuthContext = createContext<ReturnType<typeof useAuthManager>>({
+  authenticated: false,
   accessToken: '',
   setCode: () => {},
   logout: () => {},
   setRefreshToken: () => {},
-  setExpiresIn: () => {},
 })
 export const AuthProvider: React.FC = ({ children }) => {
   return (

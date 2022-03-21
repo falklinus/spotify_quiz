@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
-import { PlaylistItem } from '../components'
+import { LoadingPlaylists, PlaylistItem } from '../components'
 import { useSpotify } from 'hooks'
 
-const PlayLists = () => {
-  const { playlists, searchPlaylist, setSearchPlaylist } = useSpotify()
+const PlayLists: React.FC = () => {
+  const { playlists, isPlaylistsLoading, searchPlaylist, setSearchPlaylist } =
+    useSpotify()
 
   return (
     <>
@@ -20,7 +21,8 @@ const PlayLists = () => {
         placeholder='Search Playlist'
       />
       <div className='grid gap-y-4 xs:grid-cols-[repeat(auto-fill,minmax(216px,1fr))]'>
-        {playlists.map((list: any) => (
+        {isPlaylistsLoading && <LoadingPlaylists />}
+        {playlists?.map((list: any) => (
           <PlaylistItem key={list.id} playlist={list} />
         ))}
       </div>

@@ -3,14 +3,14 @@ import { useAuth } from 'hooks'
 import { Login, Logout } from 'components'
 
 const Navbar = () => {
-  const { accessToken } = useAuth()
+  const { authenticated } = useAuth()
 
   return (
     <div className='flex justify-between p-4 items-center border-b'>
       <Link to='/'>
         <span>Musicquizify</span>
       </Link>
-      {accessToken ? <Logout /> : <Login />}
+      {authenticated ? <Logout /> : <Login />}
     </div>
   )
 }

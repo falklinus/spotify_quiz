@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useSpotify } from 'hooks'
 
-const RandomPage = () => {
+const RandomPage: React.FC = () => {
   const { searchPlaylist } = useSpotify()
   return (
     <div>

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useParams } from 'react-router'
 import { Link } from 'react-router-dom'
 
-const Playlist = () => {
+const Playlist: React.FC = () => {
   const { playlistTracks, setPlaylistId } = useSpotify()
   const { id } = useParams()
   useEffect(() => {

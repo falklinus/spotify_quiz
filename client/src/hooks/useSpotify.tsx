@@ -8,38 +8,42 @@ import {
 } from 'react'
 import SpotifyWebApi from 'spotify-web-api-js'
 import { useAuth } from 'hooks'
+import { useQuery } from 'react-query'
 
 const useSpotifyManager = () => {
   const Spotify = useMemo(() => new SpotifyWebApi(), [])
-
   const { accessToken } = useAuth()
-
   useEffect(() => {
     if (accessToken) Spotify.setAccessToken(accessToken)
     else Spotify.setAccessToken('')
   }, [accessToken, Spotify])
 
-  /*
-    Manage playlist search through context
-  */
-  // State variables for search and playlist response
-  const [searchPlaylist, setSearchPlaylist] = useState('')
+  const { data: playlists, isLoading: isPlaylistsLoading } = useQuery(
+    'playlists',
+    () => Spotify.getUserPlaylists().then((resp) => resp.items),
+    {
+      enabled: !!accessToken,
+    }
+  )
+
+  /*****
+  Replaced By useQuery
+
   const [playlists, setPlaylists] = useState<
     SpotifyApi.PlaylistObjectSimplified[]
   >([])
-  const [playlistId, setPlaylistId] = useState('')
-  const [playlistTracks, setPlaylistTracks] =
-    useState<SpotifyApi.PlaylistTrackObject[]>()
-
-  // Function to get playlists from Api
   useEffect(() => {
     if (!accessToken) return
     Spotify.getUserPlaylists()
       .then((resp) => resp.items)
       .then(setPlaylists)
   }, [Spotify, accessToken])
+  *****/
 
-  // Get single playlist with ID from Api
+  // Get tracks on playlist by ID
+  const [playlistId, setPlaylistId] = useState('')
+  const [playlistTracks, setPlaylistTracks] =
+    useState<SpotifyApi.PlaylistTrackObject[]>()
   useEffect(() => {
     if (!playlistId) return
     Spotify.getPlaylistTracks(playlistId)
@@ -48,14 +52,16 @@ const useSpotifyManager = () => {
   }, [Spotify, playlistId])
 
   // Filter playlist on search input
+  const [searchPlaylist, setSearchPlaylist] = useState('')
   const filteredPlaylist = useMemo(
     () =>
-      playlists.filter((list) =>
+      playlists?.filter((list) =>
         list.name.toLowerCase().includes(searchPlaylist.toLowerCase())
       ),
     [playlists, searchPlaylist]
   )
 
+  // Get single track by ID
   const getTrackById = useCallback(
     async (trackId: string) => {
       const track = await Spotify.getTrack(trackId)
@@ -66,6 +72,7 @@ const useSpotifyManager = () => {
 
   return {
     playlists: filteredPlaylist,
+    isPlaylistsLoading,
     searchPlaylist,
     setSearchPlaylist,
     playlistTracks,
@@ -76,6 +83,7 @@ const useSpotifyManager = () => {
 
 const SpotifyContext = createContext<ReturnType<typeof useSpotifyManager>>({
   playlists: [],
+  isPlaylistsLoading: false,
   searchPlaylist: '',
   setSearchPlaylist: () => {},
   playlistTracks: [],

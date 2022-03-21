@@ -39,8 +39,8 @@ export const authService = {
       .refreshAccessToken()
       .then((data: any) => {
         res.json({
-          accessToken: data.body.accessToken,
-          expiresIn: data.body.expiresIn,
+          accessToken: data.body.access_token,
+          expiresIn: data.body.expires_in,
         })
       })
       .catch((err: any) => {
